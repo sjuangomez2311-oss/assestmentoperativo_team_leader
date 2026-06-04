@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Team Leader | Konecta</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        kBlue: '#0033A0',
+                        kLightBlue: '#0072CE',
+                        kCyan: '#00C3E3',
+                        kDark: '#0f172a',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome y Google Fonts -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Evita scroll de la página completa, usamos slider */
+            transition: background-color 0.5s ease;
+        }
+        
+        .light body { background-color: #f8fafc; color: #1e293b; }
+        .dark body { background-color: #0f172a; color: #f8fafc; }
+
+        /* Contenedor del Slider */
+        .slider-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .view-section {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            padding: 80px 5% 100px;
+            overflow-y: auto;
+            opacity: 0;
+            transform: translateX(50px);
+            transition: all 0.5s ease-in-out;
+            pointer-events: none;
+        }
+
+        .view-section.active {
+            opacity: 1;
+            transform: translateX(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        /* Glassmorphism Panels */
+        .clean-card {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            border-radius: 12px;
+        }
+        .dark .clean-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(51, 65, 85, 0.8);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* Footer / Navigation */
+        .glass-footer {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%;
+            height: 70px;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            z-index: 50;
+        }
+        .dark .glass-footer {
+            background: rgba(15,23,42,0.8);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .btn-nav {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-nav.primary {
+            background: var(--kBlue, #0033A0);
+            color: white;
+        }
+        .btn-nav.primary:hover {
+            background: var(--kLightBlue, #0072CE);
+        }
+        .btn-nav.secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        .dark .btn-nav.secondary {
+            background: #334155;
+            color: #cbd5e1;
+        }
+
+        /* Header Dark Mode Toggle */
+        .top-header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            z-index: 50;
+            background: transparent;
+        }
+        
+        .theme-toggle {
+            cursor: pointer;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(128,128,128,0.2);
+            transition: all 0.3s;
+        }
+        .theme-toggle:hover { background: rgba(128,128,128,0.4); }
+
+        /* Trident CSS para Triadas */
+        .trident-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .trident-top {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+        .trident-top::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 15%;
+            right: 15%;
+            height: 3px;
+            background-color: currentColor;
+        }
+        .trident-bottom {
+            position: relative;
+        }
+        .trident-bottom::before {
+            content: '';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            width: 3px;
+            height: 15px;
+            background-color: currentColor;
+            transform: translateX(-50%);
+        }
+        
+        /* Ocultar scrollbars */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.3); border-radius: 10px; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="top-header">
+        <div class="font-bold text-xl tracking-tight text-kBlue dark:text-kCyan">
+            <i class="fas fa-headset mr-2"></i>Konecta
+        </div>
+        <button class="theme-toggle text-slate-800 dark:text-white" onclick="toggleTheme()">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:block"></i>
+        </button>
+    </header>
+
+    <div class="slider-container" id="slider">
+        
+        <!-- SLIDE 1: DIAGNÓSTICO Y PRIORIDADES -->
+        <section class="view-section active" id="slide-0">
+            <div class="max-w-7xl mx-auto py-10">
+                <div class="mb-10 text-center">
+                    <span class="px-4 py-1 rounded-full bg-blue-100 text-kBlue dark:bg-blue-900 dark:text-kCyan text-sm font-bold tracking-widest uppercase mb-4 inline-block">Assessment Líder de Equipo</span>
+                    <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">Diagnóstico Comercial</h1>
+                    <p class="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
+                        La caída en los indicadores no refleja falta de talento comercial, ya que el equipo sostuvo un sobrecumplimiento en ventas superior al 95% durante un año. El quiebre es netamente motivacional: la pérdida de la comisión en el 45% de los ejecutivos detonó un desgaste que se traduce en evasión de turnos en los días de mayor tráfico. Nuestra misión es recuperar la agresividad en el cierre de ventas estabilizando la conexión en piso.
+                    </p>
+                </div>
+
+                <!-- Las 3 Prioridades de Ventas -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Prioridad 1 -->
+                    <div class="clean-card p-6 border-t-4 border-red-500 hover:-translate-y-1 transition-transform">
+                        <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl mb-4">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2 text-slate-900 dark:text-white">1. Contención del Ausentismo</h3>
+                        <p class="text-xs font-bold uppercase text-red-500 mb-3">El "Fuego Inmediato"</p>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">
+                            <strong>¿Por qué?</strong> El aumento al 10% en ausentismo destruye nuestro embudo de conversión. Si no hay comerciales en línea, el indicador de Ventas por Hora (VPH) de los que sí asisten se penaliza por el desborde de tráfico, afectando sus cierres y su Kei.
+                        </p>
+                    </div>
+
+                    <!-- Prioridad 2 -->
+                    <div class="clean-card p-6 border-t-4 border-amber-500 hover:-translate-y-1 transition-transform">
+                        <div class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mb-4">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2 text-slate-900 dark:text-white">2. Micro-gestión Comercial</h3>
+                        <p class="text-xs font-bold uppercase text-amber-500 mb-3">El "Bolsillo"</p>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">
+                            <strong>¿Por qué?</strong> La motivación del ejecutivo está en su comisión. Al no poder modificar la meta del cliente, debemos "trocear" la cuota en micrometas de cierres diarios y por hora. Devolveremos el hambre de vender demostrando que comisionar el 100% es posible.
+                        </p>
+                    </div>
+
+                    <!-- Prioridad 3 -->
+                    <div class="clean-card p-6 border-t-4 border-kCyan hover:-translate-y-1 transition-transform">
+                        <div class="w-12 h-12 rounded-full bg-cyan-100 text-kCyan flex items-center justify-center text-xl mb-4">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h3 class="font-bold text-xl mb-2 text-slate-900 dark:text-white">3. Calibración de Calidad y Kei</h3>
+                        <p class="text-xs font-bold uppercase text-kCyan mb-3">La "Sostenibilidad"</p>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">
+                            <strong>¿Por qué?</strong> Con el equipo conectado y enfocado en su variable, atacaremos la raíz de la caída de satisfacción ajustando el manejo de objeciones y la calidad del discurso de ventas mediante feedback en vivo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: PLAN DE ACCIÓN (MATRIZ 3x3) -->
+        <section class="view-section" id="slide-1">
+            <div class="max-w-7xl mx-auto py-6">
+                <div class="mb-10 text-center">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-2">Plan de Acción Inmediato</h2>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">Matriz de Choque (Máximo 3 puntos)</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Punto 1 -->
+                    <div class="clean-card p-0 flex flex-col md:flex-row overflow-hidden border-l-4 border-l-kBlue">
+                        <div class="bg-slate-100 dark:bg-slate-800 p-6 md:w-1/4 flex flex-col justify-center items-center text-center border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700">
+                            <div class="w-12 h-12 rounded-full bg-kBlue text-white flex items-center justify-center text-xl mb-3"><i class="fas fa-user-shield"></i></div>
+                            <h3 class="font-bold text-slate-900 dark:text-white">1. Choque de Disponibilidad y Adherencia</h3>
+                        </div>
+                        <div class="p-6 md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-xs text-kBlue dark:text-kCyan font-bold uppercase mb-1">Metodología (¿Cómo?)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-300"><strong>"Clínica de Ausentismo":</strong> Entrevistas 1 a 1 inmediatas tras cada incapacidad. Negociación de aceleradores de tiempo: si cumplen la métrica diaria antes del cierre, ganan pausas activas o gestión de turnos, reduciendo estrés sin afectar metas.</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                                <p class="text-sm mb-2"><i class="far fa-calendar-alt text-kBlue mr-2"></i> <strong>¿Cuándo?:</strong> Semanas 1 a 2</p>
+                                <p class="text-sm"><i class="fas fa-users text-kBlue mr-2"></i> <strong>¿Con quién?:</strong> Team Leader, apoyo WFM y RRHH.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Punto 2 -->
+                    <div class="clean-card p-0 flex flex-col md:flex-row overflow-hidden border-l-4 border-l-amber-500">
+                        <div class="bg-slate-100 dark:bg-slate-800 p-6 md:w-1/4 flex flex-col justify-center items-center text-center border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700">
+                            <div class="w-12 h-12 rounded-full bg-amber-500 text-white flex items-center justify-center text-xl mb-3"><i class="fas fa-chart-line"></i></div>
+                            <h3 class="font-bold text-slate-900 dark:text-white">2. Micro-gestión y Tácticas de Piso</h3>
+                        </div>
+                        <div class="p-6 md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-xs text-amber-600 dark:text-amber-400 font-bold uppercase mb-1">Metodología (¿Cómo?)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-300"><strong>Gestión por SPH:</strong> Trasladar la meta inamovible mensual a seguimiento horario. Reactivar motivación del 45% afectado con reconocimientos en caliente y gamificación en sala para impulsar interacciones.</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                                <p class="text-sm mb-2"><i class="far fa-calendar-alt text-amber-500 mr-2"></i> <strong>¿Cuándo?:</strong> Semanas 1 a 8</p>
+                                <p class="text-sm"><i class="fas fa-users text-amber-500 mr-2"></i> <strong>¿Con quién?:</strong> Team Leader.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Punto 3 -->
+                    <div class="clean-card p-0 flex flex-col md:flex-row overflow-hidden border-l-4 border-l-kCyan">
+                        <div class="bg-slate-100 dark:bg-slate-800 p-6 md:w-1/4 flex flex-col justify-center items-center text-center border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700">
+                            <div class="w-12 h-12 rounded-full bg-kCyan text-white flex items-center justify-center text-xl mb-3"><i class="fas fa-headset"></i></div>
+                            <h3 class="font-bold text-slate-900 dark:text-white">3. Plan Padrino y Calibración Calidad</h3>
+                        </div>
+                        <div class="p-6 md:w-3/4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="text-xs text-kCyan font-bold uppercase mb-1">Metodología (¿Cómo?)</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-300"><strong>Auditoría Causa Raíz y Shadowing:</strong> Emparejar a asesores del top 55% que sí comisionan con los del 45% que no. Realizar escuchas en vivo y role-plays antes de conectar en los días de mayor flujo.</p>
+                            </div>
+                            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg">
+                                <p class="text-sm mb-2"><i class="far fa-calendar-alt text-kCyan mr-2"></i> <strong>¿Cuándo?:</strong> Semanas 3 a 8</p>
+                                <p class="text-sm"><i class="fas fa-users text-kCyan mr-2"></i> <strong>¿Con quién?:</strong> Team Leader y Calidad.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: ORQUESTACIÓN TRANSVERSAL (5 ÁREAS EXACTAS) -->
+        <section class="view-section" id="slide-2">
+            <div class="max-w-7xl mx-auto py-10">
+                <div class="mb-10 text-center">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-2">Orquestación Transversal</h2>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">Relacionamiento con las 5 áreas clave.</p>
+                </div>
+
+                <!-- Fila Superior: WFM, Reclutamiento, SST -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                    <div class="clean-card p-6 border-t-4 border-kBlue">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-chart-pie text-2xl text-kBlue"></i>
+                            <h3 class="font-bold text-lg text-slate-900 dark:text-white">W.F.M.</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Crucial para cruzar la curva de llamadas con disponibilidad real, prever días de flujo y reubicar horarios/almuerzos evitando abandonos.</p>
+                    </div>
+
+                    <div class="clean-card p-6 border-t-4 border-indigo-500">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-users-cog text-2xl text-indigo-500"></i>
+                            <h3 class="font-bold text-lg text-slate-900 dark:text-white">Reclutamiento</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Talento Humano. Alineación de perfiles y soporte para gestionar el recurso humano ante el alza de ausentismo táctico.</p>
+                    </div>
+
+                    <div class="clean-card p-6 border-t-4 border-emerald-500">
+                        <div class="flex items-center gap-3 mb-3">
+                            <i class="fas fa-heartbeat text-2xl text-emerald-500"></i>
+                            <h3 class="font-bold text-lg text-slate-900 dark:text-white">S.S.T.</h3>
+                        </div>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Seguridad y Salud en el Trabajo. Validar si incapacidades repetitivas ameritan plan médico o procesos disciplinarios (ausentismo 10%).</p>
+                    </div>
+                </div>
+
+                <!-- Fila Inferior: Experiencia de Clientes (Calidad + Formación) -->
+                <div class="clean-card p-6 border-l-4 border-kCyan">
+                    <div class="mb-4 text-center">
+                        <h3 class="font-black text-xl text-slate-900 dark:text-white">Experiencia de Clientes</h3>
+                        <p class="text-sm text-slate-500">Garante de Excelencia y Sostenibilidad</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded flex gap-4 items-start">
+                            <i class="fas fa-search text-kCyan text-xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white mb-1">Calidad</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">Para calibrar la matriz de evaluación y asegurar que el equipo entienda cómo se evalúa el Kei bajo la situación actual del negocio.</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded flex gap-4 items-start">
+                            <i class="fas fa-chalkboard-teacher text-kCyan text-xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-slate-900 dark:text-white mb-1">Formación</h4>
+                                <p class="text-sm text-slate-600 dark:text-slate-400">Despliegue de actualizaciones y re-entrenamiento en herramientas de gestión para empoderar al 45% que perdió la variable.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: PLAN DE TRABAJO (Línea de Tiempo Horizontal Visual) -->
+        <section class="view-section" id="slide-3">
+            <div class="max-w-7xl mx-auto py-10">
+                <div class="mb-16 text-center">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-2">Plan de Trabajo</h2>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">Vuelco Operativo en 2 Meses</p>
+                </div>
+
+                <!-- Timeline Horizontal (Flexbox infalible) -->
+                <div class="relative flex flex-col md:flex-row justify-between pt-4">
+                    <!-- Línea Conectora (solo visible en desktop) -->
+                    <div class="hidden md:block absolute top-[50px] left-[10%] right-[10%] h-1 bg-slate-200 dark:bg-slate-700 z-0"></div>
+
+                    <!-- Fase 1 -->
+                    <div class="relative z-10 flex flex-col items-center w-full md:w-1/4 px-4 mb-8 md:mb-0 group">
+                        <div class="w-16 h-16 rounded-full bg-white dark:bg-slate-800 border-4 border-red-500 text-red-500 flex items-center justify-center font-black text-xl mb-4 group-hover:scale-110 transition-transform">15</div>
+                        <div class="clean-card w-full p-5 text-center border-t-4 border-red-500 h-full flex flex-col">
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-1">Días 1-15</h3>
+                            <h4 class="text-red-500 text-xs font-bold uppercase mb-2">Contención</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 flex-grow">Frenar el sangrado. Reuniones 1:1, mapeo de ausentismo con RRHH y WFM. Pizarra en ceros, micrometas por hora.</p>
+                        </div>
+                    </div>
+
+                    <!-- Fase 2 -->
+                    <div class="relative z-10 flex flex-col items-center w-full md:w-1/4 px-4 mb-8 md:mb-0 group">
+                        <div class="w-16 h-16 rounded-full bg-white dark:bg-slate-800 border-4 border-amber-500 text-amber-500 flex items-center justify-center font-black text-xl mb-4 group-hover:scale-110 transition-transform">30</div>
+                        <div class="clean-card w-full p-5 text-center border-t-4 border-amber-500 h-full flex flex-col">
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-1">Días 16-30</h3>
+                            <h4 class="text-amber-500 text-xs font-bold uppercase mb-2">Reactivación</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 flex-grow">Ejecución de Shadowing. Métricas diarias muestran tracción. El equipo empieza a ver que la variable es alcanzable.</p>
+                        </div>
+                    </div>
+
+                    <!-- Fase 3 -->
+                    <div class="relative z-10 flex flex-col items-center w-full md:w-1/4 px-4 mb-8 md:mb-0 group">
+                        <div class="w-16 h-16 rounded-full bg-white dark:bg-slate-800 border-4 border-indigo-500 text-indigo-500 flex items-center justify-center font-black text-xl mb-4 group-hover:scale-110 transition-transform">45</div>
+                        <div class="clean-card w-full p-5 text-center border-t-4 border-indigo-500 h-full flex flex-col">
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-1">Días 31-45</h3>
+                            <h4 class="text-indigo-500 text-xs font-bold uppercase mb-2">Calibración</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 flex-grow">Con productividad controlada, foco intensivo en Calidad y Kei. Role-plays y clínicas basados en los primeros 30 días.</p>
+                        </div>
+                    </div>
+
+                    <!-- Fase 4 -->
+                    <div class="relative z-10 flex flex-col items-center w-full md:w-1/4 px-4 group">
+                        <div class="w-16 h-16 rounded-full bg-kBlue dark:bg-kCyan border-4 border-white dark:border-slate-800 text-white dark:text-slate-900 flex items-center justify-center font-black text-xl mb-4 shadow-[0_0_15px_rgba(0,195,227,0.5)] group-hover:scale-110 transition-transform">60</div>
+                        <div class="clean-card w-full p-5 text-center border-t-4 border-kBlue dark:border-kCyan h-full flex flex-col bg-blue-50 dark:bg-cyan-900/10">
+                            <h3 class="font-bold text-slate-900 dark:text-white mb-1">Días 46-60</h3>
+                            <h4 class="text-kBlue dark:text-kCyan text-xs font-bold uppercase mb-2">Cumplimiento</h4>
+                            <p class="text-xs text-slate-600 dark:text-slate-400 flex-grow font-semibold">Alcanzar 100% de productividad exigido por el Cliente. Entrega de resultados y nuevo estándar a mantener.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: MECANISMO DE TRABAJO (TRIADAS) -->
+        <section class="view-section" id="slide-4">
+            <div class="max-w-7xl mx-auto py-10">
+                <div class="mb-16 text-center">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-2">Mecanismo de Trabajo</h2>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium">Ejecución en tiempo real sin afectación de servicio.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+                    <!-- Triada 1: Planificación -->
+                    <div class="clean-card p-8 text-slate-900 dark:text-white">
+                        <h3 class="text-center font-bold text-xl mb-8 text-kBlue dark:text-kCyan">Triada de Planificación</h3>
+                        
+                        <div class="trident-container text-slate-700 dark:text-slate-300">
+                            <!-- Puntas superiores -->
+                            <div class="trident-top w-full">
+                                <div class="bg-indigo-100 dark:bg-indigo-900/50 px-4 py-2 rounded font-bold text-indigo-700 dark:text-indigo-300 text-sm shadow">Formación</div>
+                                <div class="bg-cyan-100 dark:bg-cyan-900/50 px-4 py-2 rounded font-bold text-cyan-700 dark:text-cyan-300 text-sm shadow">Calidad</div>
+                                <div class="bg-amber-100 dark:bg-amber-900/50 px-4 py-2 rounded font-bold text-amber-700 dark:text-amber-300 text-sm shadow">Team Leader</div>
+                            </div>
+                            
+                            <!-- Base -->
+                            <div class="trident-bottom mt-6">
+                                <div class="bg-slate-200 dark:bg-slate-700 px-6 py-3 rounded-lg font-black text-center shadow-md border border-slate-300 dark:border-slate-600">
+                                    <i class="fas fa-server mr-2"></i>BackOffice
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="text-center text-sm mt-6 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 pt-4">
+                            Mesa de diseño para establecer el cronograma de trabajo y los puntos prioritarios del plan de acción.
+                        </p>
+                    </div>
+
+                    <!-- Triada 2: Ejecución -->
+                    <div class="clean-card p-8 text-slate-900 dark:text-white">
+                        <h3 class="text-center font-bold text-xl mb-8 text-kBlue dark:text-kCyan">Triada de Ejecución</h3>
+                        
+                        <div class="trident-container text-slate-700 dark:text-slate-300">
+                            <!-- Puntas superiores -->
+                            <div class="trident-top w-full">
+                                <div class="bg-red-100 dark:bg-red-900/50 px-4 py-2 rounded font-bold text-red-700 dark:text-red-300 text-sm shadow">GTR</div>
+                                <div class="bg-amber-100 dark:bg-amber-900/50 px-4 py-2 rounded font-bold text-amber-700 dark:text-amber-300 text-sm shadow">Team Leader</div>
+                                <div class="bg-indigo-100 dark:bg-indigo-900/50 px-4 py-2 rounded font-bold text-indigo-700 dark:text-indigo-300 text-sm shadow">Formación</div>
+                            </div>
+                            
+                            <!-- Base -->
+                            <div class="trident-bottom mt-6">
+                                <div class="bg-kBlue text-white px-6 py-3 rounded-lg font-black text-center shadow-md">
+                                    <i class="fas fa-headset mr-2"></i>Piso de Operación
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p class="text-center text-sm mt-6 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 pt-4">
+                            Definición de espacios y abordaje para cumplir el plan sin afectar Nivel de Atención, Servicio ni Disponibilidad.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Controles Fijos -->
+    <div class="glass-footer">
+        <button class="btn-nav secondary" onclick="prevSlide()" id="btnPrev" style="visibility: hidden;">
+            <i class="fas fa-arrow-left"></i> Atrás
+        </button>
+        
+        <div class="text-slate-500 font-bold hidden md:block">
+            <span id="slideCounter" class="text-kBlue dark:text-kCyan">1 / 5</span>
+        </div>
+
+        <button class="btn-nav primary" onclick="nextSlide()" id="btnNext">
+            Siguiente <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <!-- Scripts Esenciales -->
+    <script>
+        // Lógica de Theme (Dark/Light)
+        function toggleTheme() {
+            document.documentElement.classList.toggle('dark');
+            document.documentElement.classList.toggle('light');
+        }
+
+        // Lógica de Sliders
+        let currentSlide = 0;
+        const totalSlides = 5;
+
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.view-section');
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                slide.style.transform = i < index ? 'translateX(-50px)' : 'translateX(50px)';
+                slide.style.opacity = '0';
+            });
+            
+            const activeSlide = document.getElementById(`slide-${index}`);
+            activeSlide.classList.add('active');
+            activeSlide.style.transform = 'translateX(0)';
+            activeSlide.style.opacity = '1';
+
+            currentSlide = index;
+            updateButtons();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) goToSlide(currentSlide + 1);
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) goToSlide(currentSlide - 1);
+        }
+
+        function updateButtons() {
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const counter = document.getElementById('slideCounter');
+            
+            btnPrev.style.visibility = currentSlide === 0 ? 'hidden' : 'visible';
+            
+            if (currentSlide === totalSlides - 1) {
+                btnNext.innerHTML = 'Finalizar <i class="fas fa-check"></i>';
+                btnNext.style.background = '#10b981'; // green-500
+            } else {
+                btnNext.innerHTML = 'Siguiente <i class="fas fa-arrow-right"></i>';
+                btnNext.style.background = ''; // reset to class default
+            }
+
+            if(counter) counter.innerText = `${currentSlide + 1} / ${totalSlides}`;
+        }
+
+        // Evento Teclado
+        document.addEventListener('keydown', function(event) {
+            if(event.key === "ArrowRight") nextSlide();
+            if(event.key === "ArrowLeft") prevSlide();
+        });
+    </script>
+</body>
+</html>
