@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Konecta | Team Leader</title>
+    
+    <!-- Fuentes corporativas limpias -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kBlue: '#0033A0',    /* Azul Corporativo */
+                        kLightBlue: '#0072CE',
+                        kSoftGray: '#F8FAFC', /* Fondo tranquilo */
+                        kText: '#334155',     /* Texto principal (gris oscuro) */
+                        kTextMuted: '#64748B' /* Texto secundario */
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #F8FAFC;
+            color: #334155;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Cabecera Corporativa */
+        .corporate-header {
+            background: white;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            z-index: 50;
+            position: relative;
+        }
+
+        /* Contenedor Principal y Vistas */
+        .main-content {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .view-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.5s ease-in-out;
+            padding: 3rem 5% 6rem 5%;
+            background-color: #F8FAFC;
+        }
+
+        /* Scrollbar limpia */
+        .view-section::-webkit-scrollbar { width: 6px; }
+        .view-section::-webkit-scrollbar-track { background: transparent; }
+        .view-section::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
+        
+        .view-section.active {
+            opacity: 1; visibility: visible; transform: translateY(0); z-index: 10;
+        }
+
+        /* Tarjetas (Cards) con diseño limpio */
+        .clean-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            padding: 2rem;
+            transition: box-shadow 0.3s ease;
+        }
+        .clean-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Estructura gráfica del Tridente (Triadas) */
+        .trident-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .trident-prongs {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        .trident-prong {
+            background: white;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 1rem;
+            width: 130px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #334155;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+        }
+        .trident-prong i {
+            display: block;
+            font-size: 1.5rem;
+            color: #0033A0;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Conectores del tridente */
+        .trident-connector {
+            width: 80%;
+            height: 30px;
+            border-left: 2px solid #CBD5E1;
+            border-right: 2px solid #CBD5E1;
+            border-bottom: 2px solid #CBD5E1;
+            border-radius: 0 0 8px 8px;
+            margin: -2px auto 0;
+            position: relative;
+            z-index: 1;
+        }
+        .trident-stem {
+            width: 2px;
+            height: 20px;
+            background: #CBD5E1;
+            margin: 0 auto;
+        }
+        .trident-base {
+            background: #0033A0;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            width: 100%;
+            max-width: 320px;
+            box-shadow: 0 4px 10px rgba(0,51,160,0.2);
+        }
+
+        /* Barra Inferior (Footer de controles) */
+        .corporate-footer {
+            position: fixed;
+            bottom: 0; left: 0; width: 100%; height: 70px;
+            background: white;
+            border-top: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5%;
+            z-index: 50;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.02);
+        }
+
+        .btn-nav {
+            background: white;
+            border: 1px solid #CBD5E1;
+            color: #475569;
+            padding: 10px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.95rem;
+        }
+        .btn-nav:hover { background: #F1F5F9; color: #0F172A; }
+        
+        .btn-primary { background: #0033A0; color: white; border: none; }
+        .btn-primary:hover { background: #002277; color: white; }
+
+        /* Progreso */
+        .progress-container {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .progress-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: #E2E8F0;
+            transition: background 0.3s;
+        }
+        .progress-dot.active { background: #0033A0; }
+
+        /* Timeline simplificado */
+        .timeline-step {
+            position: relative;
+            padding-left: 2rem;
+            border-left: 2px solid #E2E8F0;
+            padding-bottom: 2rem;
+        }
+        .timeline-step:last-child { border-left-color: transparent; padding-bottom: 0; }
+        .timeline-bullet {
+            position: absolute;
+            left: -0.45rem;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid #0033A0;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="corporate-header">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-kBlue rounded flex items-center justify-center text-white font-bold">K</div>
+            <span class="font-bold text-kBlue text-lg tracking-wide">Konecta</span>
+            <span class="text-gray-300 mx-2">|</span>
+            <span class="text-sm text-kTextMuted font-medium">Assessment Team Leader</span>
+        </div>
+        <div class="text-sm font-semibold text-kText">
+            Juan Sebastián Hernández
+        </div>
+    </header>
+
+    <div class="main-content">
+
+        <!-- SLIDE 1: PREMISA BASE -->
+        <section class="view-section active" id="slide-0">
+            <div class="max-w-5xl mx-auto h-full flex flex-col justify-center pb-10">
+                <span class="text-kBlue font-semibold tracking-wider uppercase text-sm mb-4 block">Visión Estratégica</span>
+                
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                    Ejecución Operativa bajo <br>
+                    <span class="text-kBlue">Metas Innegociables</span>
+                </h1>
+                
+                <div class="clean-card mt-8 border-l-4 border-l-kBlue">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800">
+                        El Punto de Partida del Liderazgo
+                    </h3>
+                    <p class="text-lg text-kText leading-relaxed">
+                        Frente al requerimiento del Cliente Corporativo, mi estrategia se construye sobre la primera regla del negocio: <strong>las metas del 100% de cumplimiento no son modificables.</strong> 
+                        <br><br>
+                        Como Team Leader, mi labor no es justificar la caída solicitando ajustes en el objetivo comercial, sino ejecutar una reestructuración táctica inmediata en el piso de operaciones. El objetivo: recuperar la adherencia, estabilizar el ausentismo táctico y devolverle a las 15 posiciones la certeza matemática de que pueden volver a comisionar.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2: DIAGNÓSTICO -->
+        <section class="view-section" id="slide-1">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-10 text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-3">Diagnóstico Causativo</h2>
+                    <p class="text-kTextMuted max-w-2xl mx-auto">El equipo tiene el talento (95%+ histórico). La caída actual es producto de un desgaste emocional y financiero que debemos frenar.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="clean-card text-center">
+                        <div class="w-16 h-16 mx-auto bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-2xl mb-4">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <h4 class="text-4xl font-bold text-gray-900 mb-1">45%</h4>
+                        <p class="text-sm font-semibold text-blue-600 mb-3 uppercase tracking-wider">Sin Variable</p>
+                        <p class="text-sm text-kText">Raíz del problema. El cambio de negocio golpeó las comisiones, generando desmotivación generalizada y un efecto dominó que destruyó el Kei y la Productividad.</p>
+                    </div>
+
+                    <div class="clean-card text-center">
+                        <div class="w-16 h-16 mx-auto bg-amber-50 text-amber-600 rounded-full flex items-center justify-center text-2xl mb-4">
+                            <i class="fas fa-users-slash"></i>
+                        </div>
+                        <h4 class="text-4xl font-bold text-gray-900 mb-1">10%</h4>
+                        <p class="text-sm font-semibold text-amber-600 mb-3 uppercase tracking-wider">Ausentismo</p>
+                        <p class="text-sm text-kText">Duplicación táctica (del 5% al 10%) en días de alto flujo. El equipo evade por estrés, saturando a los presentes y rompiendo el TMO (Tiempo Medio de Operación).</p>
+                    </div>
+
+                    <div class="clean-card text-center border-b-4 border-b-kBlue">
+                        <div class="w-16 h-16 mx-auto bg-slate-100 text-slate-700 rounded-full flex items-center justify-center text-2xl mb-4">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <h4 class="text-4xl font-bold text-gray-900 mb-1">60 Días</h4>
+                        <p class="text-sm font-semibold text-slate-700 mb-3 uppercase tracking-wider">Ultimátum</p>
+                        <p class="text-sm text-kText">Límite del Cliente Corporativo para el 100%. Exige acciones de choque inmediato, micro-gestión en tiempo real y cero curvas de aprendizaje lentas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3: ORQUESTACIÓN (5 Áreas) - Movido antes del Plan -->
+        <section class="view-section" id="slide-2">
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-10 text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-3">Orquestación Transversal (5 Ejes)</h2>
+                    <p class="text-kTextMuted max-w-2xl mx-auto">Un líder no trabaja en una isla. Articulo a las áreas de apoyo previas al lanzamiento del plan de acción para garantizar que las estrategias de piso sean operativamente viables.</p>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-6">
+                    
+                    <!-- Area WFM -->
+                    <div class="clean-card w-full md:w-[calc(33.33%-1rem)] border-l-4 border-l-blue-400">
+                        <div class="text-blue-500 mb-2 text-xl"><i class="fas fa-network-wired"></i></div>
+                        <h4 class="font-bold text-gray-900 text-md mb-1">WFM (Workforce)</h4>
+                        <p class="text-xs text-kText leading-relaxed">Cruce de la curva real de llamadas vs pronóstico. Ajuste diario de mallas, almuerzos y pausas para blindar la línea frontal en los picos de contacto.</p>
+                    </div>
+
+                    <!-- Area Reclutamiento -->
+                    <div class="clean-card w-full md:w-[calc(33.33%-1rem)] border-l-4 border-l-teal-400">
+                        <div class="text-teal-500 mb-2 text-xl"><i class="fas fa-users"></i></div>
+                        <h4 class="font-bold text-gray-900 text-md mb-1">Reclutamiento (TH)</h4>
+                        <p class="text-xs text-kText leading-relaxed">Alineación del perfil de ingreso si hay rotación, asegurando talento con tolerancia a la frustración frente a las nuevas exigencias del negocio.</p>
+                    </div>
+
+                    <!-- Area SST -->
+                    <div class="clean-card w-full md:w-[calc(33.33%-1rem)] border-l-4 border-l-red-400">
+                        <div class="text-red-500 mb-2 text-xl"><i class="fas fa-heartbeat"></i></div>
+                        <h4 class="font-bold text-gray-900 text-md mb-1">SST</h4>
+                        <p class="text-xs text-kText leading-relaxed">Gestión estricta del salto al 10% en ausentismo. Seguimiento médico para validar si las incapacidades derivan de desgaste o requieren procesos formales.</p>
+                    </div>
+
+                    <!-- Area Calidad -->
+                    <div class="clean-card w-full md:w-[calc(40%-1rem)] border-l-4 border-l-purple-400 mt-2">
+                        <div class="text-purple-500 mb-2 text-xl"><i class="fas fa-check-double"></i></div>
+                        <h4 class="font-bold text-gray-900 text-md mb-1">Calidad (Experiencia)</h4>
+                        <p class="text-xs text-kText leading-relaxed">Sesiones de calibración para garantizar que la matriz de evaluación responda justamente a la nueva situación comercial, protegiendo el indicador Kei.</p>
+                    </div>
+
+                    <!-- Area Formación -->
+                    <div class="clean-card w-full md:w-[calc(40%-1rem)] border-l-4 border-l-orange-400 mt-2">
+                        <div class="text-orange-500 mb-2 text-xl"><i class="fas fa-chalkboard-teacher"></i></div>
+                        <h4 class="font-bold text-gray-900 text-md mb-1">Formación</h4>
+                        <p class="text-xs text-kText leading-relaxed">Despliegue rápido de clínicas de ventas y reentrenamiento express sobre nuevos guiones, enfocando al equipo en metodologías asertivas (AIDA).</p>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 4: PLAN DE ACCIÓN (Matriz 3x3) - Movido después de la Orquestación -->
+        <section class="view-section" id="slide-3">
+            <div class="max-w-7xl mx-auto">
+                <div class="mb-8 text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Plan de Acción (Matriz de Choque)</h2>
+                    <p class="text-kTextMuted">Soluciones directas a los indicadores de negocio afectados.</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Pilar 1 -->
+                    <div class="clean-card flex flex-col h-full border-t-4 border-t-kBlue">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-blue-100 text-kBlue rounded-lg flex items-center justify-center"><i class="fas fa-shield-alt"></i></div>
+                            <h3 class="font-bold text-gray-900 text-lg">1. Choque de Adherencia</h3>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-kBlue mb-1">¿QUÉ?</p>
+                            <p class="text-sm text-kText mb-4">Frenar la evasión en días de alto flujo y proteger el dimensionamiento (WFM).</p>
+                            <p class="text-sm font-semibold text-kBlue mb-1">¿CÓMO?</p>
+                            <ul class="text-sm text-kText list-disc pl-4 space-y-2 mb-4">
+                                <li><strong>Clínica de Ausentismo:</strong> Entrevistas de retorno 1:1.</li>
+                                <li><strong>Time-Banking:</strong> Asesores que logren su SPH diario tempranamente ganan gestión preferencial de turnos (micropausas).</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <p class="text-xs text-kTextMuted mb-1"><strong>Cuándo:</strong> Semanas 1 y 2 (Inmediato)</p>
+                            <p class="text-xs text-kTextMuted"><strong>Con quién:</strong> TL + GTR + Talento Humano</p>
+                        </div>
+                    </div>
+
+                    <!-- Pilar 2 -->
+                    <div class="clean-card flex flex-col h-full border-t-4 border-t-amber-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-amber-100 text-amber-600 rounded-lg flex items-center justify-center"><i class="fas fa-crosshairs"></i></div>
+                            <h3 class="font-bold text-gray-900 text-lg">2. Micro-Gestión SPH</h3>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-amber-600 mb-1">¿QUÉ?</p>
+                            <p class="text-sm text-kText mb-4">Devolverle al 45% del equipo la certeza matemática de su variable.</p>
+                            <p class="text-sm font-semibold text-amber-600 mb-1">¿CÓMO?</p>
+                            <ul class="text-sm text-kText list-disc pl-4 space-y-2 mb-4">
+                                <li><strong>Fragmentación:</strong> Bajar la meta mensual a visualización de SPH (Interacciones/Ventas por Hora).</li>
+                                <li><strong>Gamificación:</strong> Micro-reconocimientos en piso al cruzar hitos diarios para recuperar la motivación.</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <p class="text-xs text-kTextMuted mb-1"><strong>Cuándo:</strong> Semanas 1 a 8 (Sostenido)</p>
+                            <p class="text-xs text-kTextMuted"><strong>Con quién:</strong> Team Leader (Piso)</p>
+                        </div>
+                    </div>
+
+                    <!-- Pilar 3 -->
+                    <div class="clean-card flex flex-col h-full border-t-4 border-t-indigo-500">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center"><i class="fas fa-star"></i></div>
+                            <h3 class="font-bold text-gray-900 text-lg">3. Calibración (Kei)</h3>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">¿QUÉ?</p>
+                            <p class="text-sm text-kText mb-4">Reparar la calidad adaptando la argumentación a la nueva realidad.</p>
+                            <p class="text-sm font-semibold text-indigo-600 mb-1">¿CÓMO?</p>
+                            <ul class="text-sm text-kText list-disc pl-4 space-y-2 mb-4">
+                                <li><strong>Plan Padrino:</strong> Asesores del top 55% que sí comisionan apoyan al 45% rezagado.</li>
+                                <li><strong>Shadowing:</strong> Escuchas en vivo (PNL y AIDA) para cierres precisos sin reventar el TMO.</li>
+                            </ul>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-100">
+                            <p class="text-xs text-kTextMuted mb-1"><strong>Cuándo:</strong> Semanas 3 a 8</p>
+                            <p class="text-xs text-kTextMuted"><strong>Con quién:</strong> TL + Calidad + Formación</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 5: MECANISMO DE TRABAJO (LAS TRIADAS) -->
+        <section class="view-section" id="slide-4">
+            <div class="max-w-6xl mx-auto w-full pb-10">
+                <div class="mb-12 text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-3">Mecanismo de Trabajo</h2>
+                    <p class="text-kTextMuted max-w-2xl mx-auto">Aseguramiento del plan de acción dividiendo la planificación estratégica de la ejecución operativa, protegiendo siempre el Nivel de Servicio.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    
+                    <!-- Triada 1: Planificación -->
+                    <div class="clean-card bg-slate-50 border-none shadow-md">
+                        <h3 class="text-center font-bold text-lg text-kBlue mb-8">Triada de Planificación Estratégica</h3>
+                        
+                        <div class="trident-container">
+                            <div class="trident-prongs">
+                                <div class="trident-prong"><i class="fas fa-chalkboard-teacher"></i> Formación</div>
+                                <div class="trident-prong"><i class="fas fa-user-tie"></i> Líder de Eq.</div>
+                                <div class="trident-prong"><i class="fas fa-check-double"></i> Calidad</div>
+                            </div>
+                            <div class="trident-connector"></div>
+                            <div class="trident-stem"></div>
+                            <div class="trident-base">
+                                <span class="block text-xs font-normal text-blue-200 mb-1">Apoyo: BackOffice</span>
+                                Definición de Cronograma y Puntos Prioritarios del Plan de Acción
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Triada 2: Ejecución -->
+                    <div class="clean-card bg-slate-50 border-none shadow-md">
+                        <h3 class="text-center font-bold text-lg text-kBlue mb-8">Triada de Ejecución en Piso</h3>
+                        
+                        <div class="trident-container">
+                            <div class="trident-prongs">
+                                <div class="trident-prong"><i class="fas fa-headset"></i> GTR (WFM)</div>
+                                <div class="trident-prong"><i class="fas fa-user-tie"></i> Líder de Eq.</div>
+                                <div class="trident-prong"><i class="fas fa-chalkboard-teacher"></i> Formación</div>
+                            </div>
+                            <div class="trident-connector"></div>
+                            <div class="trident-stem"></div>
+                            <div class="trident-base bg-indigo-700">
+                                <span class="block text-xs font-normal text-indigo-200 mb-1">Objetivo de Abordaje</span>
+                                Intervención sin afectar Nivel de Atención, Servicio y Disponibilidad
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 6: RUTA DE EJECUCIÓN (Cronograma) -->
+        <section class="view-section" id="slide-5">
+            <div class="max-w-4xl mx-auto w-full pb-10">
+                <div class="mb-10 text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Cronograma de Recuperación</h2>
+                    <p class="text-kTextMuted">Ruta de hitos trazada para cumplir el ultimátum de 60 días del Cliente.</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="timeline-step">
+                        <div class="timeline-bullet"></div>
+                        <h4 class="font-bold text-gray-900 text-lg">Días 1 al 15: Contención Inmediata</h4>
+                        <p class="text-sm text-kText mt-1">Clínicas de ausentismo 1:1, nivelación de mallas con WFM y despliegue del seguimiento de SPH (ventas/servicios por hora) en piso.</p>
+                        <span class="inline-block mt-2 text-xs font-semibold bg-gray-100 text-gray-600 px-2 py-1 rounded">Hito: Detener el incremento táctico de ausentismo.</span>
+                    </div>
+
+                    <div class="timeline-step">
+                        <div class="timeline-bullet"></div>
+                        <h4 class="font-bold text-gray-900 text-lg">Días 16 al 30: Reactivación de Operación</h4>
+                        <p class="text-sm text-kText mt-1">Incentivos en sala. Los asesores visualizan que la meta fragmentada es lograble y estabilizamos la adherencia en horas críticas.</p>
+                        <span class="inline-block mt-2 text-xs font-semibold bg-blue-50 text-blue-600 px-2 py-1 rounded">Hito: Recuperación de la confianza del 45% afectado.</span>
+                    </div>
+
+                    <div class="timeline-step">
+                        <div class="timeline-bullet"></div>
+                        <h4 class="font-bold text-gray-900 text-lg">Días 31 al 45: Calibración Técnica</h4>
+                        <p class="text-sm text-kText mt-1">Ejecución de la Triada 2 (Shadowing enfocado). Refinamiento en el manejo de objeciones y validación de calidad junto con las áreas de formación.</p>
+                        <span class="inline-block mt-2 text-xs font-semibold bg-blue-50 text-blue-600 px-2 py-1 rounded">Hito: Nivelación ascendente del indicador Kei.</span>
+                    </div>
+
+                    <div class="timeline-step">
+                        <div class="timeline-bullet" style="background: #0033A0;"></div>
+                        <h4 class="font-bold text-kBlue text-lg">Días 46 al 60: Cumplimiento y Consolidación</h4>
+                        <p class="text-sm text-kText mt-1">Operación rodando bajo la nueva estrategia. Asesores comisionando y estabilización total del volumen de interacciones.</p>
+                        <span class="inline-block mt-2 text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded">Hito Final: Entrega del 100% de Productividad.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Controles de Navegación Fijos -->
+    <div class="corporate-footer">
+        <button class="btn-nav" onclick="prevSlide()" id="btnPrev" style="visibility: hidden;">
+            <i class="fas fa-chevron-left"></i> Anterior
+        </button>
+        
+        <div class="progress-container" id="progressDots">
+            <div class="progress-dot active"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+            <div class="progress-dot"></div>
+        </div>
+
+        <button class="btn-nav btn-primary" onclick="nextSlide()" id="btnNext">
+            Siguiente <i class="fas fa-chevron-right"></i>
+        </button>
+    </div>
+
+    <!-- Script Principal -->
+    <script>
+        let currentSlide = 0;
+        const totalSlides = 6; // Actualizado a 6 por la nueva diapositiva
+
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.view-section');
+            slides.forEach((slide) => slide.classList.remove('active'));
+            document.getElementById(`slide-${index}`).classList.add('active');
+            
+            // Actualizar puntos de progreso
+            const dots = document.querySelectorAll('.progress-dot');
+            dots.forEach((dot, i) => {
+                dot.classList.toggle('active', i === index);
+            });
+
+            currentSlide = index;
+            updateButtons();
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) { goToSlide(currentSlide + 1); }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) { goToSlide(currentSlide - 1); }
+        }
+
+        function updateButtons() {
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            
+            btnPrev.style.visibility = currentSlide === 0 ? 'hidden' : 'visible';
+            
+            if (currentSlide === totalSlides - 1) {
+                btnNext.innerHTML = 'Finalizar <i class="fas fa-check"></i>';
+            } else {
+                btnNext.innerHTML = 'Siguiente <i class="fas fa-chevron-right"></i>';
+            }
+        }
+
+        // Navegación rápida con teclado
+        document.addEventListener('keydown', function(event) {
+            if(event.key === "ArrowRight" || event.key === "ArrowDown") nextSlide();
+            if(event.key === "ArrowLeft" || event.key === "ArrowUp") prevSlide();
+        });
+        
+        // Exponer funciones al scope global
+        window.goToSlide = goToSlide;
+        window.nextSlide = nextSlide;
+        window.prevSlide = prevSlide;
+    </script>
+</body>
+</html>
